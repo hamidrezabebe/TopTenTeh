@@ -1,0 +1,443 @@
+/* ─── RESET & BASE ─────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --gold: #c9a84c;
+  --gold-dim: rgba(201, 168, 76, 0.5);
+  --gold-faint: rgba(201, 168, 76, 0.12);
+  --white: #ffffff;
+  --white-70: rgba(255, 255, 255, 0.7);
+  --white-40: rgba(255, 255, 255, 0.4);
+  --white-15: rgba(255, 255, 255, 0.15);
+  --white-06: rgba(255, 255, 255, 0.06);
+  --white-03: rgba(255, 255, 255, 0.03);
+  --charcoal: #0a0a0a;
+  --font: 'Inter Tight', -apple-system, 'Helvetica Neue', sans-serif;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: #000000;
+  color: var(--white);
+  font-family: var(--font);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── SCROLL TRACK ──────────────────────────────────────── */
+.scroll-track {
+  position: relative;
+  z-index: 1;
+}
+
+.scroll-section {
+  height: 100vh;
+  position: relative;
+}
+
+/* ─── CANVAS FIXED LAYER ────────────────────────────────── */
+.canvas-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+
+/* ─── CUSTOM CURSOR ─────────────────────────────────────── */
+.cursor-dot {
+  position: fixed;
+  width: 6px;
+  height: 6px;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.1s ease;
+  mix-blend-mode: normal;
+}
+
+.cursor-ring {
+  position: fixed;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--gold-dim);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.cursor-ring.hovered {
+  width: 48px;
+  height: 48px;
+  border-color: var(--gold);
+  background: var(--gold-faint);
+}
+
+/* ─── INTRO OVERLAY ─────────────────────────────────────── */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.intro-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-logo {
+  font-size: clamp(48px, 10vw, 96px);
+  font-weight: 200;
+  letter-spacing: 0.25em;
+  color: var(--white);
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(24px);
+  animation: fadeUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+.intro-tagline {
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 0.55em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-top: 16px;
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+}
+
+.intro-scroll-hint {
+  position: fixed;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: fadeIn 1s ease 2.2s forwards;
+}
+
+.scroll-label {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.45em;
+  color: var(--white-40);
+  text-transform: uppercase;
+}
+
+.scroll-line {
+  width: 1px;
+  height: 44px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2.4s ease infinite;
+}
+
+/* ─── CATEGORY UI OVERLAY ───────────────────────────────── */
+.category-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cat-center {
+  text-align: center;
+  position: relative;
+}
+
+.cat-ghost-number {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(120px, 22vw, 200px);
+  font-weight: 200;
+  color: rgba(255, 255, 255, 0.025);
+  letter-spacing: -0.05em;
+  line-height: 1;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.cat-eyebrow {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.55em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cat-eyebrow.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cat-title {
+  font-size: clamp(32px, 6vw, 60px);
+  font-weight: 200;
+  letter-spacing: 0.15em;
+  color: var(--white);
+  text-transform: uppercase;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+}
+
+.cat-title.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cat-subtitle {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--white-40);
+  margin-top: 20px;
+  letter-spacing: 0.08em;
+  max-width: 380px;
+  line-height: 1.9;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s;
+}
+
+.cat-subtitle.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ─── RANKINGS PANEL ────────────────────────────────────── */
+.rankings-panel {
+  position: fixed;
+  right: clamp(20px, 4vw, 56px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rank-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  padding: 12px 20px 14px;
+  min-width: 210px;
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.25s ease, border-color 0.25s ease;
+  cursor: pointer;
+}
+
+.rank-card.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.rank-card:hover {
+  background: rgba(201, 168, 76, 0.08);
+  border-color: rgba(201, 168, 76, 0.28);
+}
+
+.rank-card:hover .rank-num {
+  color: var(--gold);
+}
+
+.rank-num {
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.4em;
+  color: rgba(201, 168, 76, 0.55);
+  text-transform: uppercase;
+  transition: color 0.25s ease;
+}
+
+.rank-name {
+  font-size: 13px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.82);
+  margin-top: 3px;
+  letter-spacing: 0.05em;
+}
+
+.rank-location {
+  font-size: 10px;
+  font-weight: 300;
+  color: var(--white-40);
+  margin-top: 3px;
+  letter-spacing: 0.06em;
+}
+
+/* ─── LEFT ACCENT LINE ──────────────────────────────────── */
+.left-accent {
+  position: fixed;
+  left: clamp(24px, 4vw, 56px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.accent-line {
+  width: 1px;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--gold-dim), transparent);
+}
+
+.accent-index {
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--white-40);
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+}
+
+/* ─── PROGRESS ──────────────────────────────────────────── */
+.progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(to right, var(--gold), rgba(201, 168, 76, 0.2));
+  z-index: 200;
+  transition: width 0.1s linear;
+}
+
+.progress-dots {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.progress-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--white-15);
+  transition: all 0.4s ease;
+}
+
+.progress-dot.active {
+  background: var(--gold);
+  transform: scale(1.4);
+}
+
+/* ─── CATEGORY COUNTER ──────────────────────────────────── */
+.cat-counter {
+  position: fixed;
+  top: 40px;
+  right: clamp(20px, 4vw, 56px);
+  z-index: 200;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 0.35em;
+  color: var(--white-40);
+  pointer-events: none;
+}
+
+.wordmark {
+  position: fixed;
+  top: 40px;
+  left: clamp(20px, 4vw, 56px);
+  z-index: 200;
+  font-size: 14px;
+  font-weight: 300;
+  letter-spacing: 0.5em;
+  color: var(--white-70);
+  pointer-events: none;
+  text-transform: uppercase;
+}
+
+/* ─── PARTICLE CANVAS ───────────────────────────────────── */
+.particle-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ─── ANIMATIONS ────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes scrollPulse {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 0; }
+  20%  { opacity: 1; }
+  50%  { transform: scaleY(1); transform-origin: top; }
+  51%  { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+/* ─── TRANSITION VIGNETTE ───────────────────────────────── */
+.vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    rgba(0, 0, 0, 0.65) 100%
+  );
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .rankings-panel {
+    right: 12px;
+  }
+  .rank-card {
+    min-width: 160px;
+    padding: 10px 14px 12px;
+  }
+  .rank-name { font-size: 11px; }
+  .cat-subtitle { display: none; }
+  .left-accent { display: none; }
+}
